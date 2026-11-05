@@ -1,0 +1,5 @@
+RAG means Retrieval Augmented Generation.
+Steps: load files, split into chunks, embed chunks, store in vector DB.
+A query is embedded too, and the nearest chunks are found by similarity.
+The found chunks are added to the prompt so the LLM answers from them.
+Chroma is a vector database that can save data to disk.

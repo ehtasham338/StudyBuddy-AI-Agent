@@ -1,0 +1,5 @@
+LangGraph builds AI agents as a graph of nodes and edges.
+Nodes do small jobs, edges decide which node runs next.
+State is a bag that carries messages through the graph.
+A router node reads the question and picks a path.
+Checkpoints save state to a file, so memory survives restarts.

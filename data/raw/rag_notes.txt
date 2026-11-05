@@ -1,0 +1,5 @@
+MCP means Model Context Protocol.
+An MCP server exposes tools that an AI agent can call.
+stdio transport means the server talks over input and output pipes.
+MCP tools are async, so the agent should use ainvoke or astream.
+FastMCP is a simple way to write an MCP server in Python.
