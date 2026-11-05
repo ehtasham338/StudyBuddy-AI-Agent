@@ -18,6 +18,11 @@ Conversation memory:
     SQLite stores LangGraph checkpoints.
     The history field stores previous chat messages.
     The checkpointer preserves state for each thread_id.
+
+Streaming:
+    The CLI uses graph.astream() with stream_mode="updates".
+    Each finished node prints its name immediately,
+    so you can watch the workflow move room by room.
 """
 
 import asyncio
@@ -391,6 +396,7 @@ async def main():
     Start StudyBuddy with persistent conversation memory.
 
     SQLite stores checkpoints for each conversation thread.
+    The CLI streams node-by-node progress using graph.astream().
     """
 
     # Ensure the data directory exists.
@@ -428,17 +434,30 @@ async def main():
             if not question:
                 continue
 
-            # Execute the asynchronous LangGraph workflow.
-            result = await graph.ainvoke(
+            # Execute the workflow with streaming (node-by-node updates).
+            # Each yielded update is a dict: {node_name: fields_it_filled}.
+            answer = ""
+            sources = []
+
+            async for update in graph.astream(
                 {"question": question},
-                config
-            )
+                config,
+                stream_mode="updates"
+            ):
+                for node_name, node_output in update.items():
+                    print(f"   [node done] {node_name}")
+
+                    if node_output and "answer" in node_output:
+                        answer = node_output["answer"]
+
+                    if node_output and node_output.get("sources"):
+                        sources = node_output["sources"]
 
             print("\nAnswer:")
-            print(result["answer"])
+            print(answer)
 
-            if result.get("sources"):
-                print("\nSources:", ", ".join(result["sources"]))
+            if sources:
+                print("\nSources:", ", ".join(sources))
 
 
 if __name__ == "__main__":
